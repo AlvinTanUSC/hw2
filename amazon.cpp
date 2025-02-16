@@ -8,6 +8,7 @@
 #include "product.h"
 #include "db_parser.h"
 #include "product_parser.h"
+#include "mydatastore.h"
 #include "util.h"
 
 using namespace std;
@@ -29,7 +30,7 @@ int main(int argc, char* argv[])
      * Declare your derived DataStore object here replacing
      *  DataStore type to your derived type
      ****************/
-    DataStore ds;
+    MyDataStore ds;
 
 
 
@@ -60,7 +61,6 @@ int main(int argc, char* argv[])
     cout << "  BUYCART username                   " << endl;
     cout << "  QUIT new_db_filename               " << endl;
     cout << "====================================" << endl;
-
     vector<Product*> hits;
     bool done = false;
     while(!done) {
@@ -99,9 +99,40 @@ int main(int argc, char* argv[])
                 }
                 done = true;
             }
-	    /* Add support for other commands here */
-
-
+            else if (cmd == "ADD"){
+              string username;
+              int hit_result_index;
+              if(ss >> username && ds.checkUser(username)){
+                if(ss >> hit_result_index && (hit_result_index <= hits.size() && hit_result_index > 0) && !hits.empty()){
+                    ds.addCart(username, hits[hit_result_index - 1]);
+                } else {
+                cout << "Invalid request" << endl;
+                }
+              } else {
+                cout << "Invalid request" << endl;
+              }
+              
+            } else if (cmd == "VIEWCART"){
+              string username;
+              if(ss >> username){
+                if(!ds.checkUser(username))
+                  cout << "Invalid username" << endl;
+                else
+                  ds.viewCart(username);
+              } else {
+                cout << "Invalid request" << endl;
+              }
+            } else if (cmd == "BUYCART"){
+              
+              string username;
+              if(ss >> username){
+                if(!ds.checkUser(username))
+                  cout << "Invalid username" << endl;
+                else
+                  ds.buyCart(username);
+              } else 
+                cout << "Invalid request" << endl;
+            }
 
 
             else {
