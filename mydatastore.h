@@ -44,6 +44,7 @@ class MyDataStore : public DataStore{
     std::vector<User*> users_;
     std::map<std::string, User*> usernames_;
     std::map<std::string, std::deque<Product*>> carts_;
+    std::map<std::string, std::set<Product*>> keysearch_;
 };
 
 #endif

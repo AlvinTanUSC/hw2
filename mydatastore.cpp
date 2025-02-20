@@ -17,6 +17,8 @@ MyDataStore::~MyDataStore(){
 
 void MyDataStore::addProduct(Product* p){
   products_.push_back(p);
+  for(string key : p->keywords())
+    keysearch_[key].insert(p);
 }
 
 void MyDataStore::addUser(User* u){
@@ -69,23 +71,22 @@ void MyDataStore::buyCart(string username){
 }
 
 std::vector<Product*> MyDataStore::search(std::vector<std::string>& terms, int type){
-  vector<Product*> results;
+  set<Product*> results;
   set<string> searchterms;
   for(string s : terms)
     searchterms.insert(s);
   if(!type){
-    for(Product* p : products_){
-      set<string> keywords = p->keywords();
-      set<string> inter = setIntersection(keywords, searchterms);
-      if(setIntersection(searchterms, keywords).size() == terms.size())
-        results.push_back(p);
-      }
-    } else {
-    for(Product* p : products_){
-          set<string> keywords = p->keywords();
-          if(setIntersection(keywords, searchterms).size())
-            results.push_back(p);
-          }
+    results = keysearch_[terms[0]];
+    for (string key : terms){
+      results = setIntersection(results, keysearch_[key]);
     }
-  return results;
+    } else {
+    for (string key : terms){
+      results = setUnion(results, keysearch_[key]);
+    }
+    }
+  vector<Product*> ret;
+  for (set<Product*>::iterator it = results.begin(); it != results.end(); it++)
+    ret.push_back(*it);
+  return ret;
 }
